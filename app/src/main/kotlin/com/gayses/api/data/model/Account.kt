@@ -20,7 +20,7 @@ class Account(
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     val projects: Set<Project> = setOf(),
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "Account_Role",
         joinColumns = [JoinColumn(name = "AccountId")],

@@ -1,4 +1,4 @@
-package com.gayses.api.service.token
+package com.security.jwt.service
 
 import org.springframework.security.core.userdetails.UserDetails
 

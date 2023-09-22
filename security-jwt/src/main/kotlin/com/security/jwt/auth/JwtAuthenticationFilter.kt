@@ -1,6 +1,6 @@
-package com.gayses.api.security.filter
+package com.security.jwt.auth
 
-import com.gayses.api.service.token.TokenService
+import com.security.jwt.service.TokenService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 
-@Component
 class JwtAuthenticationFilter(
     private val tokenService: TokenService,
     private val userDetailsService: UserDetailsService

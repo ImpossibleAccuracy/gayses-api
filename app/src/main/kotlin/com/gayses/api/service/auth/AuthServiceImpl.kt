@@ -4,7 +4,7 @@ import com.gayses.api.data.model.Account
 import com.gayses.api.data.repository.AccountRepository
 import com.gayses.api.exception.OperationRejectedException
 import com.gayses.api.service.auth.AuthService.AuthResult
-import com.gayses.api.service.token.TokenService
+import com.security.jwt.service.TokenService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 

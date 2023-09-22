@@ -17,6 +17,8 @@ allOpen {
 }
 
 dependencies {
+    implementation project(":security-jwt")
+
     // PLATFORM DEPENDENCIES
     implementation libs.kotlin.reflect
     implementation libs.kotlin.stdlib
