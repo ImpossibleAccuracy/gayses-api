@@ -1,0 +1,46 @@
+plugins {
+    alias libs.plugins.spring
+    alias libs.plugins.dependency.management
+
+    alias libs.plugins.kotlin.jvm
+    alias libs.plugins.kotlin.allopen
+    alias libs.plugins.kotlin.spring
+    alias libs.plugins.kotlin.jpa
+}
+
+allOpen {
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.Embeddable")
+    annotation("jakarta.persistence.MappedSuperclass")
+    annotation("jakarta.persistence.Embeddable")
+    annotation("com.gayses.api.utils.DTO")
+}
+
+dependencies {
+    // PLATFORM DEPENDENCIES
+    implementation libs.kotlin.reflect
+    implementation libs.kotlin.stdlib
+
+    // SPRING DEPENDENCIES
+    implementation libs.spring.web
+    implementation libs.spring.validation
+    implementation libs.spring.security
+    implementation libs.spring.data.jpa
+    implementation libs.spring.actuator
+    developmentOnly libs.spring.devtools
+
+    // DATABASE DEPENDENCIES
+    runtimeOnly libs.mysql.connector
+
+    // JWT DEPENDENCIES
+    implementation libs.jwt.api
+    implementation libs.jwt.jackson
+    implementation libs.jwt.impl
+
+    // OTHER DEPENDENCIES
+    implementation libs.jackson.kotlin
+    implementation libs.model.mapper
+
+    // TEST DEPENDENCIES
+    testImplementation libs.spring.test
+}

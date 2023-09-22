@@ -1,0 +1,59 @@
+package com.gayses.api.service.auth
+
+import com.gayses.api.data.model.Account
+import com.gayses.api.data.repository.AccountRepository
+import com.gayses.api.exception.OperationRejectedException
+import com.gayses.api.service.auth.AuthService.AuthResult
+import com.gayses.api.service.token.TokenService
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Service
+
+@Service
+class AuthServiceImpl(
+    private val tokenService: TokenService,
+    private val accountRepository: AccountRepository,
+    private val passwordEncoder: PasswordEncoder
+) : AuthService {
+    override fun login(email: String, password: String): AuthResult {
+        val validEmail = email.trim()
+        val validPassword = password.trim()
+
+        val account = accountRepository.findByEmailIgnoreCase(validEmail)
+            .orElseThrow {
+                OperationRejectedException("User with such credentials not found")
+            }
+
+        if (!passwordEncoder.matches(validPassword, account.passwordHash)) {
+            throw OperationRejectedException("User with such credentials not found")
+        }
+
+        return AuthResult(
+            account,
+            tokenService.generateToken(account)
+        )
+    }
+
+    override fun registration(email: String, password: String): AuthResult {
+        val validEmail = email.trim()
+        val validPassword = password.trim()
+
+        if (accountRepository.existsByEmailIgnoreCase(validEmail)) {
+            throw OperationRejectedException("User with such credentials already exists")
+        }
+
+        val passwordHash = passwordEncoder.encode(validPassword)
+
+        val account = Account(
+            null,
+            validEmail,
+            passwordHash
+        ).let {
+            accountRepository.save(it)
+        }
+
+        return AuthResult(
+            account,
+            tokenService.generateToken(account)
+        )
+    }
+}
