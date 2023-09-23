@@ -8,13 +8,17 @@ abstract class BaseModel<T : Serializable>(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id", nullable = false, updatable = false)
-    private val _id: T?
+    private var _id: T?
 ) {
     val id: T
         get() = _id!!
 
     val hasId: Boolean
         get() = _id != null
+
+    fun updateId(id: T) {
+        this._id = id
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

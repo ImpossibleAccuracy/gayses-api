@@ -2,6 +2,7 @@ package com.gayses.api.service.auth
 
 import com.gayses.api.data.model.Account
 import com.gayses.api.data.repository.AccountRepository
+import com.gayses.api.exception.InvalidServiceArguments
 import com.gayses.api.exception.OperationRejectedException
 import com.gayses.api.service.auth.AuthService.AuthResult
 import com.security.jwt.service.TokenService
@@ -15,6 +16,14 @@ class AuthServiceImpl(
     private val passwordEncoder: PasswordEncoder
 ) : AuthService {
     override fun login(email: String, password: String): AuthResult {
+        if (email.isBlank()) {
+            throw InvalidServiceArguments("Email cannot be blank")
+        }
+
+        if (password.isBlank()) {
+            throw InvalidServiceArguments("Password cannot be blank")
+        }
+
         val validEmail = email.trim()
         val validPassword = password.trim()
 
@@ -34,6 +43,14 @@ class AuthServiceImpl(
     }
 
     override fun registration(email: String, password: String): AuthResult {
+        if (email.isBlank()) {
+            throw InvalidServiceArguments("Email cannot be blank")
+        }
+
+        if (password.isBlank()) {
+            throw InvalidServiceArguments("Password cannot be blank")
+        }
+
         val validEmail = email.trim()
         val validPassword = password.trim()
 

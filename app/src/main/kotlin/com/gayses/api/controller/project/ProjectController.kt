@@ -24,7 +24,7 @@ class ProjectController(
     @Operation(summary = "Create project")
     @PostMapping
     fun createProject(@RequestBody data: @Valid CreateProjectRequest): ResponseEntity<ProjectDto> =
-        projectService.createProject(data.title, ControllerHelper.account).let {
+        projectService.createProject(ControllerHelper.account, data.title).let {
             val response = modelMapper.map(it, ProjectDto::class.java)
 
             ResponseEntity.ok(response)

@@ -1,8 +1,10 @@
 [versions]
 kotlin-version = "1.9.10"
 spring-version = "3.1.3"
-spring-opemapi-version = "2.2.0"
+spring-openapi-version = "2.2.0"
+junit-version = "5.8.2"
 mysql-connector-version = "8.0.32"
+h2-connector-version = "2.2.224"
 jackson-version = "2.15.2"
 dependency-management-version = "1.1.3"
 modelmapper-version = "3.1.1"
@@ -18,9 +20,12 @@ spring-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-
 spring-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator", version.ref = "spring-version" }
 spring-devtools = { module = "org.springframework.boot:spring-boot-devtools", version.ref = "spring-version" }
 spring-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-version" }
-spring-openapi-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "spring-opemapi-version" }
-spring-openapi-webmvc-api = { module = "org.springdoc:springdoc-openapi-starter-webmvc-api", version.ref = "spring-opemapi-version" }
+spring-openapi-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "spring-openapi-version" }
+spring-openapi-webmvc-api = { module = "org.springdoc:springdoc-openapi-starter-webmvc-api", version.ref = "spring-openapi-version" }
+junit-jupiter-api = {module="org.junit.jupiter:junit-jupiter-api", version.ref ="junit-version"}
+junit-jupiter-engine = {module="org.junit.jupiter:junit-jupiter-engine", version.ref ="junit-version"}
 mysql-connector = { module = "com.mysql:mysql-connector-j", version.ref = "mysql-connector-version" }
+h2-connector = { module = "com.h2database:h2", version.ref = "h2-connector-version" }
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-version" }
 model-mapper = { module = "org.modelmapper:modelmapper", version.ref = "modelmapper-version" }
 jwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt-version" }

@@ -1,5 +1,6 @@
 package com.gayses.api.handler
 
+import com.gayses.api.exception.InvalidServiceArguments
 import com.gayses.api.exception.OperationRejectedException
 import com.gayses.api.exception.ResourceAccessDeniedException
 import com.gayses.api.exception.ResourceNotFoundException
@@ -22,9 +23,19 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
             e.javaClass.name
         )
 
+    @ExceptionHandler(InvalidServiceArguments::class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    fun handleInvalidServiceArgumentsException(e: InvalidServiceArguments) =
+        ErrorResponse(
+            Instant.now(),
+            HttpStatus.BAD_REQUEST.ordinal,
+            e.message ?: "Invalid data",
+            e.javaClass.name
+        )
+
     @ExceptionHandler(OperationRejectedException::class)
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
-    fun handleResourceOperationRejected(e: OperationRejectedException) =
+    fun handleOperationRejectedException(e: OperationRejectedException) =
         ErrorResponse(
             Instant.now(),
             HttpStatus.FORBIDDEN.ordinal,

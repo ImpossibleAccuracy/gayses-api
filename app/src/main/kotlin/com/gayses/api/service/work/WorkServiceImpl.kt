@@ -3,6 +3,7 @@ package com.gayses.api.service.work
 import com.gayses.api.data.model.*
 import com.gayses.api.data.model.Unit
 import com.gayses.api.data.repository.*
+import com.gayses.api.exception.InvalidServiceArguments
 import com.gayses.api.exception.ResourceNotFoundException
 import org.springframework.stereotype.Service
 import java.util.*
@@ -31,6 +32,12 @@ class WorkServiceImpl(
         expectedFinishDate: Date?,
         finishDate: Date?
     ): WorkQueueItem {
+        validateData(type, workTitle, productTitle, unit, amount, performer)
+
+        if (expectedItemOrder != null && expectedItemOrder < 0) {
+            throw InvalidServiceArguments("Work's order cannot be lower then zero")
+        }
+
         val workTypeTrim = type.trim()
         val unitTrim = unit?.trim()
         val performerTrim = performer.trim()
@@ -107,14 +114,16 @@ class WorkServiceImpl(
         finishDate: Date?
     ): Work =
         getWorkOrThrow(project, workId)
-            .also {
+            .also { work ->
+                validateData(type, workTitle, productTitle, unit, amount, performer)
+
                 val workTypeTrim = type.trim()
                 val unitTrim = unit?.trim()
                 val performerTrim = performer.trim()
                 val workTitleTrim = workTypeTrim.trim()
                 val productTitleTrim = productTitle.trim()
 
-                it.type = workTypeRepository
+                work.type = workTypeRepository
                     .findByTitleIgnoreCase(workTypeTrim)
                     .orElseGet {
                         WorkType(null, workTypeTrim).let {
@@ -122,7 +131,7 @@ class WorkServiceImpl(
                         }
                     }
 
-                it.unit = unitTrim?.let {
+                work.unit = unitTrim?.let {
                     unitRepository
                         .findByTitleIgnoreCase(it)
                         .orElseGet {
@@ -132,7 +141,7 @@ class WorkServiceImpl(
                         }
                 }
 
-                it.performer = performerRepository
+                work.performer = performerRepository
                     .findByTitleIgnoreCase(performerTrim)
                     .orElseGet {
                         Performer(null, performerTrim).let {
@@ -140,15 +149,15 @@ class WorkServiceImpl(
                         }
                     }
 
-                it.workTitle = workTitleTrim
-                it.productTitle = productTitleTrim
-                it.amount = amount
-                it.expectedPaymentDate = expectedPaymentDate?.toInstant()
-                it.paymentDate = paymentDate?.toInstant()
-                it.expectedDeliveryDate = expectedDeliveryDate?.toInstant()
-                it.deliveryDate = deliveryDate?.toInstant()
-                it.expectedFinishDate = expectedFinishDate?.toInstant()
-                it.finishDate = finishDate?.toInstant()
+                work.workTitle = workTitleTrim
+                work.productTitle = productTitleTrim
+                work.amount = amount
+                work.expectedPaymentDate = expectedPaymentDate?.toInstant()
+                work.paymentDate = paymentDate?.toInstant()
+                work.expectedDeliveryDate = expectedDeliveryDate?.toInstant()
+                work.deliveryDate = deliveryDate?.toInstant()
+                work.expectedFinishDate = expectedFinishDate?.toInstant()
+                work.finishDate = finishDate?.toInstant()
             }.let {
                 workRepository.save(it)
             }
@@ -158,6 +167,10 @@ class WorkServiceImpl(
             .findByWork__idAndProject_Id(work.id, project.id)
             .orElseThrow()
             .also { workQueueItem ->
+                if (newOrder < 0) {
+                    throw InvalidServiceArguments("Work's order cannot be lower then zero")
+                }
+
                 val queue = getWorkQueue(project)
 
                 val queueWithoutItem = queue.filterNot {
@@ -191,6 +204,39 @@ class WorkServiceImpl(
             .orElseThrow {
                 ResourceNotFoundException("Work($id) not found")
             }
+
+    private fun validateData(
+        type: String,
+        workTitle: String,
+        productTitle: String,
+        unit: String?,
+        amount: Int,
+        performer: String
+    ) {
+        if (type.isBlank()) {
+            throw InvalidServiceArguments("Work type cannot be blank")
+        }
+
+        if (workTitle.isBlank()) {
+            throw InvalidServiceArguments("Work's project title cannot be blank")
+        }
+
+        if (productTitle.isBlank()) {
+            throw InvalidServiceArguments("Work's product title cannot be blank")
+        }
+
+        if (unit != null && unit.isBlank()) {
+            throw InvalidServiceArguments("Unit cannot be blank")
+        }
+
+        if (amount <= 0) {
+            throw InvalidServiceArguments("Product project's lower or equals than zero")
+        }
+
+        if (performer.isBlank()) {
+            throw InvalidServiceArguments("Work's performer cannot be blank")
+        }
+    }
 
     private fun saveWorkInQueue(project: Project, work: Work, expectedItemOrder: Int?): WorkQueueItem {
         val queue = workQueueRepository.findByProject_IdOrderByOrderAsc(project.id)

@@ -22,6 +22,7 @@ dependencies {
     // PLATFORM DEPENDENCIES
     implementation libs.kotlin.reflect
     implementation libs.kotlin.stdlib
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     // SPRING DEPENDENCIES
     implementation libs.spring.web
@@ -48,5 +49,18 @@ dependencies {
     implementation libs.model.mapper
 
     // TEST DEPENDENCIES
-    testImplementation libs.spring.test
+    testImplementation libs.junit.jupiter.api
+    testImplementation libs.junit.jupiter.engine
+    testImplementation(libs.spring.test) {
+        exclude(group: "junit", module: "junit")
+    }
+
+    // TODO
+    testImplementation "io.mockk:mockk:1.12.4"
+    testImplementation "io.mockk:mockk-agent-jvm:1.12.4"
+    testImplementation libs.h2.connector
+}
+
+test {
+    useJUnitPlatform()
 }

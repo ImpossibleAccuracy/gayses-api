@@ -3,9 +3,12 @@ package com.gayses.api.service.work
 import com.gayses.api.data.model.Project
 import com.gayses.api.data.model.Work
 import com.gayses.api.data.model.WorkQueueItem
+import com.gayses.api.exception.InvalidServiceArguments
+import com.gayses.api.exception.OperationRejectedException
 import java.util.*
 
 interface WorkService {
+    @Throws(InvalidServiceArguments::class)
     fun createWork(
         project: Project,
         expectedItemOrder: Int?,
@@ -27,6 +30,7 @@ interface WorkService {
 
     fun getWorkQueue(project: Project): List<WorkQueueItem>
 
+    @Throws(InvalidServiceArguments::class)
     fun updateWork(
         project: Project,
         workId: Long,
@@ -44,6 +48,7 @@ interface WorkService {
         finishDate: Date?
     ): Work
 
+    @Throws(InvalidServiceArguments::class)
     fun reorderWorkOrder(project: Project, work: Work, newOrder: Int): WorkQueueItem
 
     fun deleteWork(project: Project, workId: Long)
