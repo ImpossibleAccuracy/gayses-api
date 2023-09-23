@@ -11,4 +11,12 @@ interface ProjectService {
 
     @Throws(ResourceAccessDeniedException::class)
     fun getProject(projectId: Long, account: Account): Project
+
+    fun getAllProjects(account: Account): List<Project>
+
+    @Throws(ResourceAccessDeniedException::class, OperationRejectedException::class)
+    fun updateProject(projectId: Long, account: Account, title: String): Project
+
+    @Throws(ResourceAccessDeniedException::class, OperationRejectedException::class)
+    fun deleteProject(projectId: Long, account: Account)
 }

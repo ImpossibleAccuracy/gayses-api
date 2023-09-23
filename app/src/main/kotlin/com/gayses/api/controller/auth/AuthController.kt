@@ -5,6 +5,8 @@ import com.gayses.api.controller.auth.payload.LoginRequest
 import com.gayses.api.controller.auth.payload.RegistrationRequest
 import com.gayses.api.data.model.Account
 import com.gayses.api.service.auth.AuthService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager

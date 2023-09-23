@@ -5,10 +5,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import java.util.*
 
-data class CreateWorkRequest(
-    @JsonProperty("order")
-    val order: Int?,
-
+data class UpdateWorkRequest(
     @NotNull
     @NotBlank
     @JsonProperty("type")

@@ -12,4 +12,20 @@ abstract class BaseModel<T : Serializable>(
 ) {
     val id: T
         get() = _id!!
+
+    val hasId: Boolean
+        get() = _id != null
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is BaseModel<*>) return false
+
+        if (_id != other._id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return _id?.hashCode() ?: 0
+    }
 }

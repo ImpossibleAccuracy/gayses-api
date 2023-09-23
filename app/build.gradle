@@ -31,6 +31,10 @@ dependencies {
     implementation libs.spring.actuator
     developmentOnly libs.spring.devtools
 
+    // OPENAPI DEPENDENCIES
+    implementation libs.spring.openapi.webmvc.api
+    implementation libs.spring.openapi.webmvc.ui
+
     // DATABASE DEPENDENCIES
     runtimeOnly libs.mysql.connector
 

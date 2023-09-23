@@ -13,7 +13,7 @@ spring:
     filter:
       order: 10
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: validate
       naming:

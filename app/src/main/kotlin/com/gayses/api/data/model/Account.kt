@@ -52,4 +52,30 @@ class Account(
 
     override fun isEnabled(): Boolean =
         true
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Account) return false
+        if (!super.equals(other)) return false
+
+        if (email != other.email) return false
+        if (passwordHash != other.passwordHash) return false
+        if (projects != other.projects) return false
+        if (roles != other.roles) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + email.hashCode()
+        result = 31 * result + passwordHash.hashCode()
+        result = 31 * result + projects.hashCode()
+        result = 31 * result + roles.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "Account(id=$id, email='$email')"
+    }
 }
