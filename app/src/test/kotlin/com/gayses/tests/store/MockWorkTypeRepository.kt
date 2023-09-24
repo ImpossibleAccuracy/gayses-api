@@ -26,7 +26,9 @@ object MockWorkTypeRepository : MockStore<WorkType>() {
                 .answers {
                     val item = firstArg<WorkType>()
 
-                    item.updateId(idGenerator.incrementAndGet())
+                    if (!item.hasId) {
+                        item.updateId(idGenerator.incrementAndGet())
+                    }
 
                     item
                 }

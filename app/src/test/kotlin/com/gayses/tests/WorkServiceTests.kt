@@ -142,19 +142,21 @@ class WorkServiceTests {
         fun provideValidItemOrderDataToUpdate(): Stream<Arguments> =
             streamOf(
                 // @formatter:off
+                Arguments.of(1, 1, 0, 0),
+                Arguments.of(1, 1, 1, 1),
+                Arguments.of(1, 1, 3, 3),
+                Arguments.of(1, 1, 3, 4),
+                Arguments.of(1, 1, 3, 5),
+                Arguments.of(1, 1, 3, 999),
+                Arguments.of(1, 1, 3, Integer.MAX_VALUE),
+
                 Arguments.of(1, 3, 0, 0),
                 Arguments.of(1, 3, 1, 1),
-                Arguments.of(1, 3, 2, 2),
-                Arguments.of(1, 3, 4, 4),
-                Arguments.of(1, 3, 4, 5),
-                Arguments.of(1, 3, 4, 999),
-                Arguments.of(1, 3, 4, Integer.MAX_VALUE),
-//                Arguments.of(2, 2, 1, 0),
-//                Arguments.of(2, 2, 1, 1),
-//                Arguments.of(2, 2, 2, 2),
-//                Arguments.of(2, 2, 4, 4),
-//                Arguments.of(2, 2, 4, 5),
-//                Arguments.of(2, 2, 4, Integer.MAX_VALUE),
+                Arguments.of(1, 3, 3, 3),
+                Arguments.of(1, 3, 3, 4),
+                Arguments.of(1, 3, 3, 5),
+                Arguments.of(1, 3, 3, 999),
+                Arguments.of(1, 3, 3, Integer.MAX_VALUE),
                 // @formatter:on
             )
 

@@ -35,7 +35,9 @@ object MockProjectRepository : MockStore<Project>() {
                 .answers {
                     val item = firstArg() as Project
 
-                    item.updateId(idGenerator.incrementAndGet())
+                    if (!item.hasId) {
+                        item.updateId(idGenerator.incrementAndGet())
+                    }
 
                     item
                 }

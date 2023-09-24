@@ -38,7 +38,9 @@ object MockWorkQueueRepository : MockStore<WorkQueueItem>() {
                 .answers {
                     val item = firstArg<WorkQueueItem>()
 
-                    item.updateId(idGenerator.incrementAndGet())
+                    if (!item.hasId) {
+                        item.updateId(idGenerator.incrementAndGet())
+                    }
 
                     item
                 }
@@ -48,7 +50,9 @@ object MockWorkQueueRepository : MockStore<WorkQueueItem>() {
                     val items = firstArg<Iterable<WorkQueueItem>>()
 
                     items.forEach {
-                        it.updateId(idGenerator.incrementAndGet())
+                        if (!it.hasId) {
+                            it.updateId(idGenerator.incrementAndGet())
+                        }
                     }
 
                     items.toList()

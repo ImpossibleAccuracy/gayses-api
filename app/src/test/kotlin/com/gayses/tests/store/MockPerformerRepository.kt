@@ -26,7 +26,9 @@ object MockPerformerRepository : MockStore<Performer>() {
                 .answers {
                     val item = firstArg<Performer>()
 
-                    item.updateId(idGenerator.incrementAndGet())
+                    if (!item.hasId) {
+                        item.updateId(idGenerator.incrementAndGet())
+                    }
 
                     item
                 }

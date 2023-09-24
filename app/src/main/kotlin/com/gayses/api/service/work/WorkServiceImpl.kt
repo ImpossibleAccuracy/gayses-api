@@ -164,9 +164,9 @@ class WorkServiceImpl(
 
     override fun reorderWorkOrder(project: Project, work: Work, newOrder: Int): WorkQueueItem =
         workQueueRepository
-            .findByWork__idAndProject_Id(work.id, project.id)
+            .findByWork__idAndProject_Id(work.id, project.id) // TODO: replace with existsByWork__idAndProject_Id
             .orElseThrow()
-            .also { workQueueItem ->
+            .let { workQueueItem ->
                 if (newOrder < 0) {
                     throw InvalidServiceArguments("Work's order cannot be lower then zero")
                 }
@@ -180,22 +180,32 @@ class WorkServiceImpl(
                 val actualOrder = getItemOrder(queueWithoutItem, newOrder)
 
                 queue.forEach {
-                    if (it.id == workQueueItem.id) {
-                        it.order = actualOrder
-                    } else {
-                        if (it.order >= actualOrder) {
+                    when {
+                        it.id == workQueueItem.id -> {
+                            it.order = actualOrder
+                        }
+
+                        it.order > actualOrder -> {
                             it.order += 1
+                        }
+
+                        it.order == actualOrder -> {
+                            it.order -= 1
                         }
                     }
                 }
 
-                fixWorkItemQueueAndSave(queue)
+                fixWorkItemQueueAndSave(queue).first {
+                    it.id == workQueueItem.id
+                }
             }
 
     override fun deleteWork(project: Project, workId: Long) =
         getWorkOrThrow(project, workId)
             .let {
                 workRepository.delete(it)
+            }.also {
+                fixWorkItemQueueAndSave(getWorkQueue(project))
             }
 
     private fun getWorkOrThrow(project: Project, id: Long): Work =
@@ -272,12 +282,12 @@ class WorkServiceImpl(
         }
     }
 
-    private fun fixWorkItemQueueAndSave(queue: List<WorkQueueItem>) {
+    private fun fixWorkItemQueueAndSave(queue: List<WorkQueueItem>): List<WorkQueueItem> {
         val sortedQueue = queue.sortedBy {
             it.order
         }
 
-        if (sortedQueue.isNotEmpty()) {
+        return if (sortedQueue.isNotEmpty()) {
             val diff = sortedQueue.first().order
 
             if (diff > 0) {
@@ -300,6 +310,8 @@ class WorkServiceImpl(
             }
 
             workQueueRepository.saveAll(sortedQueue)
+        } else {
+            listOf()
         }
     }
 }

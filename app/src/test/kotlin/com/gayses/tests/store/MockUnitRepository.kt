@@ -26,7 +26,9 @@ object MockUnitRepository : MockStore<Unit>() {
                 .answers {
                     val item = firstArg<Unit>()
 
-                    item.updateId(idGenerator.incrementAndGet())
+                    if (!item.hasId) {
+                        item.updateId(idGenerator.incrementAndGet())
+                    }
 
                     item
                 }

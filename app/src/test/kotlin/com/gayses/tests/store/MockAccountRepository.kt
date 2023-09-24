@@ -55,7 +55,9 @@ object MockAccountRepository : MockStore<Account>() {
                 .answers {
                     val item = firstArg() as Account
 
-                    item.updateId(idGenerator.incrementAndGet())
+                    if (!item.hasId) {
+                        item.updateId(idGenerator.incrementAndGet())
+                    }
 
                     item
                 }
