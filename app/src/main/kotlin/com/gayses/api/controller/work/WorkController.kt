@@ -9,15 +9,16 @@ import com.gayses.api.service.work.WorkService
 import com.gayses.api.utils.ControllerHelper
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import jakarta.validation.Valid
 import org.modelmapper.ModelMapper
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/project/{projectId}/work")
 @PreAuthorize("isAuthenticated()")
+@Validated
 @SecurityRequirement(name = "bearerAuth")
 class WorkController(
     private val projectService: ProjectService,
@@ -28,7 +29,7 @@ class WorkController(
     @PostMapping
     fun createWork(
         @PathVariable("projectId") projectId: Long,
-        @RequestBody data: @Valid CreateWorkRequest
+        @RequestBody data: CreateWorkRequest
     ): ResponseEntity<WorkQueueItemDto> =
         projectService.getProject(projectId, ControllerHelper.account).let { project ->
             val workQueueItem = workService.createWork(
@@ -69,7 +70,7 @@ class WorkController(
     fun updateWork(
         @PathVariable("projectId") projectId: Long,
         @PathVariable("workId") workId: Long,
-        @RequestBody data: @Valid UpdateWorkRequest
+        @RequestBody data: UpdateWorkRequest
     ): ResponseEntity<WorkDto> =
         projectService.getProject(projectId, ControllerHelper.account).let { project ->
             val work = workService.updateWork(

@@ -41,7 +41,7 @@ class WorkServiceImpl(
         val workTypeTrim = type.trim()
         val unitTrim = unit?.trim()
         val performerTrim = performer.trim()
-        val workTitleTrim = workTypeTrim.trim()
+        val workTitleTrim = workTitle.trim()
         val productTitleTrim = productTitle.trim()
 
         val workTypeModel = workTypeRepository
@@ -120,7 +120,7 @@ class WorkServiceImpl(
                 val workTypeTrim = type.trim()
                 val unitTrim = unit?.trim()
                 val performerTrim = performer.trim()
-                val workTitleTrim = workTypeTrim.trim()
+                val workTitleTrim = workTitle.trim()
                 val productTitleTrim = productTitle.trim()
 
                 work.type = workTypeRepository
@@ -265,10 +265,11 @@ class WorkServiceImpl(
     private fun getItemOrder(queue: List<WorkQueueItem>, expectedItemOrder: Int?): Int {
         val maxQueueOrder = queue.maxOfOrNull { it.order } ?: 0
 
-        return if (expectedItemOrder == null || maxQueueOrder <= expectedItemOrder)
-            maxQueueOrder + 1
-        else
-            expectedItemOrder
+        return when {
+            (queue.isEmpty()) -> 0
+            (expectedItemOrder == null || maxQueueOrder <= expectedItemOrder) -> (maxQueueOrder + 1)
+            else -> expectedItemOrder
+        }
     }
 
     private fun fixWorkItemQueueAndSave(queue: List<WorkQueueItem>) {

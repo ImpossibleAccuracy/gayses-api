@@ -7,15 +7,16 @@ import com.gayses.api.service.project.ProjectService
 import com.gayses.api.utils.ControllerHelper
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import jakarta.validation.Valid
 import org.modelmapper.ModelMapper
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/project")
 @PreAuthorize("isAuthenticated()")
+@Validated
 @SecurityRequirement(name = "bearerAuth")
 class ProjectController(
     private val projectService: ProjectService,
@@ -23,7 +24,7 @@ class ProjectController(
 ) {
     @Operation(summary = "Create project")
     @PostMapping
-    fun createProject(@RequestBody data: @Valid CreateProjectRequest): ResponseEntity<ProjectDto> =
+    fun createProject(@RequestBody data: CreateProjectRequest): ResponseEntity<ProjectDto> =
         projectService.createProject(ControllerHelper.account, data.title).let {
             val response = modelMapper.map(it, ProjectDto::class.java)
 
@@ -55,7 +56,7 @@ class ProjectController(
     @PutMapping("/{id}")
     fun updateProjectById(
         @PathVariable("id") id: Long,
-        @RequestBody data: @Valid UpdateProjectRequest
+        @RequestBody data: UpdateProjectRequest
     ): ResponseEntity<ProjectDto> =
         projectService.updateProject(id, ControllerHelper.account, data.title)
             .let {

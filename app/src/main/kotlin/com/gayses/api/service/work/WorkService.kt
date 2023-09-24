@@ -4,7 +4,7 @@ import com.gayses.api.data.model.Project
 import com.gayses.api.data.model.Work
 import com.gayses.api.data.model.WorkQueueItem
 import com.gayses.api.exception.InvalidServiceArguments
-import com.gayses.api.exception.OperationRejectedException
+import com.gayses.api.exception.ResourceNotFoundException
 import java.util.*
 
 interface WorkService {
@@ -26,6 +26,7 @@ interface WorkService {
         finishDate: Date?
     ): WorkQueueItem
 
+    @Throws(ResourceNotFoundException::class)
     fun getWork(project: Project, workId: Long): Work
 
     fun getWorkQueue(project: Project): List<WorkQueueItem>

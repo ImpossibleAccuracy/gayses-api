@@ -4,6 +4,7 @@ import com.gayses.api.data.model.Account
 import com.gayses.api.data.model.Project
 import com.gayses.api.data.repository.ProjectRepository
 import com.gayses.api.exception.InvalidServiceArguments
+import com.gayses.api.exception.OperationDeniedException
 import com.gayses.api.exception.ResourceAccessDeniedException
 import com.gayses.api.exception.ResourceNotFoundException
 import org.springframework.stereotype.Service
@@ -43,7 +44,7 @@ class ProjectServiceImpl(
             .also {
                 if (it.owner.id != account.id) {
                     // TODO: impl editors list
-                    throw ResourceAccessDeniedException("You haven't access to this project")
+                    throw OperationDeniedException("You haven't access to this project")
                 }
             }
             .let {
@@ -58,7 +59,7 @@ class ProjectServiceImpl(
             .also {
                 if (it.owner.id != account.id) {
                     // TODO: impl owners list
-                    throw ResourceAccessDeniedException("You haven't access to this project")
+                    throw OperationDeniedException("You haven't access to this project")
                 }
             }
             .let {

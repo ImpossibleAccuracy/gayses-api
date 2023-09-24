@@ -1,9 +1,6 @@
 package com.gayses.api.handler
 
-import com.gayses.api.exception.InvalidServiceArguments
-import com.gayses.api.exception.OperationRejectedException
-import com.gayses.api.exception.ResourceAccessDeniedException
-import com.gayses.api.exception.ResourceNotFoundException
+import com.gayses.api.exception.*
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -34,11 +31,11 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         )
 
     @ExceptionHandler(OperationRejectedException::class)
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     fun handleOperationRejectedException(e: OperationRejectedException) =
         ErrorResponse(
             Instant.now(),
-            HttpStatus.FORBIDDEN.ordinal,
+            HttpStatus.UNAUTHORIZED.ordinal,
             e.message ?: "Operation rejected",
             e.javaClass.name
         )
@@ -46,6 +43,16 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(ResourceAccessDeniedException::class)
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
     fun handleResourceAccessDeniedException(e: ResourceAccessDeniedException) =
+        ErrorResponse(
+            Instant.now(),
+            HttpStatus.FORBIDDEN.ordinal,
+            e.message ?: "Resource access denied",
+            e.javaClass.name
+        )
+
+    @ExceptionHandler(OperationDeniedException::class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    fun handleOperationDeniedException(e: OperationDeniedException) =
         ErrorResponse(
             Instant.now(),
             HttpStatus.FORBIDDEN.ordinal,

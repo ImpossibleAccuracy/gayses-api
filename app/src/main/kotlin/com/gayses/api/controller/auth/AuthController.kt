@@ -5,12 +5,10 @@ import com.gayses.api.controller.auth.payload.LoginRequest
 import com.gayses.api.controller.auth.payload.RegistrationRequest
 import com.gayses.api.data.model.Account
 import com.gayses.api.service.auth.AuthService
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
-import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -18,12 +16,13 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/auth")
+@Validated
 class AuthController(
     private val authService: AuthService,
     private val authManager: AuthenticationManager
 ) {
     @PostMapping("/signin")
-    fun login(@RequestBody data: @Valid LoginRequest): ResponseEntity<AuthResponse> =
+    fun login(@RequestBody data: LoginRequest): ResponseEntity<AuthResponse> =
         authService.login(data.email, data.password).let {
             authenticateInternal(it.account, data.password.trim())
 
@@ -33,7 +32,7 @@ class AuthController(
         }
 
     @PostMapping("/signup")
-    fun registration(@RequestBody data: @Valid RegistrationRequest): ResponseEntity<AuthResponse> =
+    fun registration(@RequestBody data: RegistrationRequest): ResponseEntity<AuthResponse> =
         authService.registration(data.email, data.password).let {
             authenticateInternal(it.account, data.password.trim())
 

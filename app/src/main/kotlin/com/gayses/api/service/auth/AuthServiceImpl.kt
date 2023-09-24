@@ -3,6 +3,7 @@ package com.gayses.api.service.auth
 import com.gayses.api.data.model.Account
 import com.gayses.api.data.repository.AccountRepository
 import com.gayses.api.exception.InvalidServiceArguments
+import com.gayses.api.exception.OperationDeniedException
 import com.gayses.api.exception.OperationRejectedException
 import com.gayses.api.service.auth.AuthService.AuthResult
 import com.security.jwt.service.TokenService
@@ -55,7 +56,7 @@ class AuthServiceImpl(
         val validPassword = password.trim()
 
         if (accountRepository.existsByEmailIgnoreCase(validEmail)) {
-            throw OperationRejectedException("User with such credentials already exists")
+            throw OperationDeniedException("User with such credentials already exists")
         }
 
         val passwordHash = passwordEncoder.encode(validPassword)
