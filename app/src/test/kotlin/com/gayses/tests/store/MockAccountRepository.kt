@@ -1,47 +1,38 @@
-package com.gayses.api.store
+package com.gayses.tests.store
 
 import com.gayses.api.data.model.Account
 import com.gayses.api.data.repository.AccountRepository
-import io.mockk.coEvery
+import com.gayses.tests.data.TestsDataStore
+import io.mockk.every
 import io.mockk.mockk
 import java.util.*
 
 object MockAccountRepository : MockStore<Account>() {
-    fun encryptPassword(pass: String) = "pass_$pass"
-
-    fun decryptPassword(hash: String) = hash.substring(4)
-
-    override val data: List<Account>
-        get() = listOf(
-            Account(1, "admin@email.com", encryptPassword("123")),
-            Account(2, "user@email.com", encryptPassword("456"))
-        )
-
     override fun create() =
-        mockk<AccountRepository>().also { repo ->
+        mockk<AccountRepository> {
             // FIND BY ID
-            coEvery { repo.findById(any()) }
+            every { findById(any()) }
                 .returns(Optional.empty())
 
-            data.forEach {
-                coEvery { repo.findById(it.id) }
+            TestsDataStore.accounts.forEach {
+                every { findById(it.id) }
                     .returns(Optional.of(it))
             }
 
             // FIND EMAIL
-            coEvery { repo.findByEmail(any()) }
+            every { findByEmail(any()) }
                 .returns(Optional.empty())
 
-            data.forEach {
-                coEvery { repo.findByEmail(it.email) }
+            TestsDataStore.accounts.forEach {
+                every { findByEmail(it.email) }
                     .returns(Optional.of(it))
             }
 
-            coEvery { repo.findByEmailIgnoreCase(any()) }
+            every { findByEmailIgnoreCase(any()) }
                 .answers { _ ->
                     val email = firstArg() as String
 
-                    val account = data.find {
+                    val account = TestsDataStore.accounts.find {
                         it.email.equals(email, true)
                     }
 
@@ -50,17 +41,17 @@ object MockAccountRepository : MockStore<Account>() {
                 }
 
             // EXISTS EMAIL
-            coEvery { repo.existsByEmailIgnoreCase(any()) }
+            every { existsByEmailIgnoreCase(any()) }
                 .answers { _ ->
                     val email = firstArg() as String
 
-                    data.any {
+                    TestsDataStore.accounts.any {
                         it.email.equals(email, true)
                     }
                 }
 
             // SAVE
-            coEvery { repo.save(any()) }
+            every { save(any()) }
                 .answers {
                     val item = firstArg() as Account
 
@@ -70,7 +61,7 @@ object MockAccountRepository : MockStore<Account>() {
                 }
 
             // DELETE
-            coEvery { repo.delete(any()) }
+            every { delete(any()) }
                 .returns(Unit)
         }
 }
