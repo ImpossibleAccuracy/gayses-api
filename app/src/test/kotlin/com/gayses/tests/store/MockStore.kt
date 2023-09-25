@@ -1,10 +1,10 @@
 package com.gayses.tests.store
 
+import com.gayses.tests.data.TestsDataStore
 import org.springframework.data.jpa.repository.JpaRepository
-import java.util.concurrent.atomic.AtomicLong
 
 abstract class MockStore<T> {
-    protected val idGenerator = AtomicLong()
+    protected val idGenerator = TestsDataStore.idGenerator
 
     abstract fun create(): JpaRepository<T, *>
 }

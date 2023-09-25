@@ -2,8 +2,11 @@ package com.gayses.tests.data
 
 import com.gayses.api.data.model.*
 import com.gayses.api.data.model.Unit
+import java.util.concurrent.atomic.AtomicLong
 
 object TestsDataStore {
+    val idGenerator = AtomicLong(100L)
+
     val accounts: List<Account>
         get() = listOf(
             Account(1, "admin@email.com", TestsUtils.encryptPassword("123")),

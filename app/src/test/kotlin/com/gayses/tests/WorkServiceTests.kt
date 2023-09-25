@@ -1,7 +1,6 @@
 package com.gayses.tests
 
 import com.gayses.api.data.model.Work
-import com.gayses.api.data.model.WorkQueueItem
 import com.gayses.api.data.repository.*
 import com.gayses.api.exception.InvalidServiceArguments
 import com.gayses.api.exception.ResourceNotFoundException
@@ -10,8 +9,6 @@ import com.gayses.api.service.work.WorkServiceImpl
 import com.gayses.tests.data.TestsDataStore
 import com.gayses.tests.ext.streamOf
 import com.gayses.tests.store.*
-import io.mockk.slot
-import io.mockk.verify
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -41,12 +38,108 @@ class WorkServiceTests {
         fun provideValidWorkData(): Stream<Arguments> =
             streamOf(
                 // @formatter:off
-                Arguments.of(1, 0, 0, TestsDataStore.workTypes.first().title, "Title", "ProductTitle", TestsDataStore.units.first().title, 23, TestsDataStore.performers.first().title, null, null, null, null, null, null),
-                Arguments.of(1, 0, 0, "M23", "Title23", "ProductTitle23", "uu23", 23, "Perf", null, null, null, null, null, null),
-                Arguments.of(1, 4, null, "M", "Title", "ProductTitle", "uu", 23, "Perf", null, null, null, null, null, null),
-                Arguments.of(1, 0, 0, "M", "Title", "ProductTitle", null, 23, "Perf", null, null, null, null, null, null),
-                Arguments.of(1, 0, 0, "M", "Title", "ProductTitle", "uu", 1, "Perf", null, null, null, null, null, null),
-                Arguments.of(1, 0, 0, "M", "Title", "ProductTitle", "uu", Integer.MAX_VALUE, "Perf", null, null, null, null, null, null),
+                Arguments.of(
+                    1,
+                    0,
+                    0,
+                    TestsDataStore.workTypes.first().title,
+                    "Title",
+                    "ProductTitle",
+                    TestsDataStore.units.first().title,
+                    23,
+                    TestsDataStore.performers.first().title,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                Arguments.of(
+                    1,
+                    0,
+                    0,
+                    "M23",
+                    "Title23",
+                    "ProductTitle23",
+                    "uu23",
+                    23,
+                    "Perf",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                Arguments.of(
+                    1,
+                    4,
+                    null,
+                    "M",
+                    "Title",
+                    "ProductTitle",
+                    "uu",
+                    23,
+                    "Perf",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                Arguments.of(
+                    1,
+                    0,
+                    0,
+                    "M",
+                    "Title",
+                    "ProductTitle",
+                    null,
+                    23,
+                    "Perf",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                Arguments.of(
+                    1,
+                    0,
+                    0,
+                    "M",
+                    "Title",
+                    "ProductTitle",
+                    "uu",
+                    1,
+                    "Perf",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                Arguments.of(
+                    1,
+                    0,
+                    0,
+                    "M",
+                    "Title",
+                    "ProductTitle",
+                    "uu",
+                    Integer.MAX_VALUE,
+                    "Perf",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
                 // @formatter:on
             )
 
@@ -55,14 +148,44 @@ class WorkServiceTests {
             streamOf(
                 // @formatter:off
                 Arguments.of(1, -1, "M", "Title", "ProductTitle", "uu", 23, "Perf", null, null, null, null, null, null),
-                Arguments.of(1, Integer.MIN_VALUE, "M", "Title", "ProductTitle", "uu", 23, "Perf", null, null, null, null, null, null),
+                Arguments.of(
+                    1,
+                    Integer.MIN_VALUE,
+                    "M",
+                    "Title",
+                    "ProductTitle",
+                    "uu",
+                    23,
+                    "Perf",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
                 Arguments.of(1, 0, "", "Title", "ProductTitle", "uu", 23, "Perf", null, null, null, null, null, null),
                 Arguments.of(1, 0, "M", "", "ProductTitle", "uu", 23, "Perf", null, null, null, null, null, null),
                 Arguments.of(1, 0, "M", "Title", "", "uu", 23, "Perf", null, null, null, null, null, null),
                 Arguments.of(1, 0, "M", "Title", "ProductTitle", "", 23, "Perf", null, null, null, null, null, null),
                 Arguments.of(1, 0, "M", "Title", "ProductTitle", "uu", -23, "Perf", null, null, null, null, null, null),
                 Arguments.of(1, 0, "M", "Title", "ProductTitle", "uu", 0, "Perf", null, null, null, null, null, null),
-                Arguments.of(1, 0, "M", "Title", "ProductTitle", "uu", Integer.MIN_VALUE, "Perf", null, null, null, null, null, null),
+                Arguments.of(
+                    1,
+                    0,
+                    "M",
+                    "Title",
+                    "ProductTitle",
+                    "uu",
+                    Integer.MIN_VALUE,
+                    "Perf",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
                 Arguments.of(1, 0, "M", "Title", "ProductTitle", "uu", 23, "", null, null, null, null, null, null),
                 // @formatter:on
             )
@@ -113,13 +236,73 @@ class WorkServiceTests {
         fun provideValidWorkDataToUpdate(): Stream<Arguments> =
             streamOf(
                 // @formatter:off
-                Arguments.of(1, 1, TestsDataStore.workTypes.first().title, "Title", "ProductTitle", TestsDataStore.units.first().title, 23, TestsDataStore.performers.first().title, null, null, null, null, null, null),
-                Arguments.of(1, 3, "M23", "Title23", "ProductTitle", "uu", 23, "Perf", null, null, null, null, null, null),
-                Arguments.of(1, 1, "M23", "Title23", "ProductTitle23", "uu23", 23, "Perf", null, null, null, null, null, null),
+                Arguments.of(
+                    1,
+                    1,
+                    TestsDataStore.workTypes.first().title,
+                    "Title",
+                    "ProductTitle",
+                    TestsDataStore.units.first().title,
+                    23,
+                    TestsDataStore.performers.first().title,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                Arguments.of(
+                    1,
+                    3,
+                    "M23",
+                    "Title23",
+                    "ProductTitle",
+                    "uu",
+                    23,
+                    "Perf",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                Arguments.of(
+                    1,
+                    1,
+                    "M23",
+                    "Title23",
+                    "ProductTitle23",
+                    "uu23",
+                    23,
+                    "Perf",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
                 Arguments.of(1, 1, "M", "Title", "ProductTitle", "uu", 23, "Perf", null, null, null, null, null, null),
                 Arguments.of(1, 1, "M", "Title", "ProductTitle", null, 23, "Perf", null, null, null, null, null, null),
                 Arguments.of(1, 1, "M", "Title", "ProductTitle", "uu", 1, "Perf", null, null, null, null, null, null),
-                Arguments.of(1, 1, "M", "Title", "ProductTitle", "uu", Integer.MAX_VALUE, "Perf", null, null, null, null, null, null),
+                Arguments.of(
+                    1,
+                    1,
+                    "M",
+                    "Title",
+                    "ProductTitle",
+                    "uu",
+                    Integer.MAX_VALUE,
+                    "Perf",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
                 // @formatter:on
             )
 
@@ -133,7 +316,22 @@ class WorkServiceTests {
                 Arguments.of(1, 1, "M", "Title", "ProductTitle", "", 23, "Perf", null, null, null, null, null, null),
                 Arguments.of(1, 1, "M", "Title", "ProductTitle", "uu", 0, "Perf", null, null, null, null, null, null),
                 Arguments.of(1, 1, "M", "Title", "ProductTitle", "uu", -23, "Perf", null, null, null, null, null, null),
-                Arguments.of(1, 1, "M", "Title", "ProductTitle", "uu", Integer.MIN_VALUE, "Perf", null, null, null, null, null, null),
+                Arguments.of(
+                    1,
+                    1,
+                    "M",
+                    "Title",
+                    "ProductTitle",
+                    "uu",
+                    Integer.MIN_VALUE,
+                    "Perf",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
                 Arguments.of(1, 1, "M", "Title", "ProductTitle", "uu", 23, "", null, null, null, null, null, null),
                 // @formatter:on
             )
@@ -233,32 +431,6 @@ class WorkServiceTests {
                 expectedFinishDate,
                 finishDate
             )
-
-            val workCaptor = slot<Work>()
-            val workQueueItemCaptor = slot<WorkQueueItem>()
-
-            verify { workRepository.save(capture(workCaptor)) }
-            verify { workQueueRepository.save(capture(workQueueItemCaptor)) }
-
-            // assert captured
-            Assertions.assertEquals(expectedItemOrder, workQueueItemCaptor.captured.order)
-            Assertions.assertEquals(project, workQueueItemCaptor.captured.project)
-
-            assertWorkContent(
-                workCaptor.captured,
-                type,
-                workTitle,
-                productTitle,
-                unit,
-                amount,
-                performer,
-                expectedPaymentDate,
-                paymentDate,
-                expectedDeliveryDate,
-                deliveryDate,
-                expectedFinishDate,
-                finishDate
-            )
         }
 
         @ParameterizedTest
@@ -334,16 +506,6 @@ class WorkServiceTests {
             // assert result
             Assertions.assertEquals(expectedItemOrder, result.order)
             Assertions.assertEquals(project, result.project)
-
-            val workCaptor = slot<Work>()
-            val workQueueItemCaptor = slot<WorkQueueItem>()
-
-            verify { workRepository.save(capture(workCaptor)) }
-            verify { workQueueRepository.save(capture(workQueueItemCaptor)) }
-
-            // assert captured
-            Assertions.assertEquals(expectedItemOrder, workQueueItemCaptor.captured.order)
-            Assertions.assertEquals(project, workQueueItemCaptor.captured.project)
         }
     }
 
@@ -357,18 +519,18 @@ class WorkServiceTests {
                 it.id == projectId
             }
 
+            val expected = TestsDataStore.works.first {
+                it.id == workId
+            }
+
             val result = workService.getWork(project, workId)
 
-            val captor = slot<Long>()
-            verify { workRepository.findBy_idAndQueueItem_Project_Id(capture(captor), projectId) }
-
-            Assertions.assertEquals(workId, result.id)
-            Assertions.assertEquals(workId, captor.captured)
+            Assertions.assertEquals(expected, result)
         }
 
         @ParameterizedTest
         @MethodSource("com.gayses.tests.WorkServiceTests#provideInvalidWorkIds")
-        fun whenGivenInvalidWorkId_thenReturnsWorkItem(projectId: Long, workId: Long) {
+        fun whenGivenInvalidWorkId_thenThrowsException(projectId: Long, workId: Long) {
             val project = TestsDataStore.projects.first {
                 it.id == projectId
             }
@@ -424,26 +586,6 @@ class WorkServiceTests {
             // assert result
             assertWorkContent(
                 result,
-                type,
-                workTitle,
-                productTitle,
-                unit,
-                amount,
-                performer,
-                expectedPaymentDate,
-                paymentDate,
-                expectedDeliveryDate,
-                deliveryDate,
-                expectedFinishDate,
-                finishDate
-            )
-
-            val workCaptor = slot<Work>()
-            verify { workRepository.save(capture(workCaptor)) }
-
-            // assert captured
-            assertWorkContent(
-                workCaptor.captured,
                 type,
                 workTitle,
                 productTitle,
@@ -599,11 +741,11 @@ class WorkServiceTests {
         Assertions.assertEquals(unit, work.unit?.title)
         Assertions.assertEquals(amount, work.amount)
         Assertions.assertEquals(performer, work.performer.title)
-        Assertions.assertEquals(expectedPaymentDate, work.expectedPaymentDate)
-        Assertions.assertEquals(paymentDate, work.paymentDate)
-        Assertions.assertEquals(expectedDeliveryDate, work.expectedDeliveryDate)
-        Assertions.assertEquals(deliveryDate, work.deliveryDate)
-        Assertions.assertEquals(expectedFinishDate, work.expectedFinishDate)
-        Assertions.assertEquals(finishDate, work.finishDate)
+        Assertions.assertEquals(expectedPaymentDate?.toInstant(), work.expectedPaymentDate)
+        Assertions.assertEquals(paymentDate?.toInstant(), work.paymentDate)
+        Assertions.assertEquals(expectedDeliveryDate?.toInstant(), work.expectedDeliveryDate)
+        Assertions.assertEquals(deliveryDate?.toInstant(), work.deliveryDate)
+        Assertions.assertEquals(expectedFinishDate?.toInstant(), work.expectedFinishDate)
+        Assertions.assertEquals(finishDate?.toInstant(), work.finishDate)
     }
 }

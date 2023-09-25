@@ -86,8 +86,20 @@ class WorkServiceImpl(
             finishDate = finishDate?.toInstant()
         ).let {
             workRepository.save(it)
-        }.let {
-            saveWorkInQueue(project, it, expectedItemOrder)
+        }.let { work ->
+            val workItems = getWorkItemsSorted(project).toMutableList()
+
+            val actualOrder = getActualItemOrder(workItems, expectedItemOrder)
+
+            if (actualOrder > workItems.size) {
+                workItems.add(work)
+            } else {
+                workItems.add(actualOrder, work)
+            }
+
+            saveWorkQueueItems(project, workItems).first {
+                it.work.id == work.id
+            }
         }
     }
 
@@ -95,7 +107,7 @@ class WorkServiceImpl(
         getWorkOrThrow(project, workId)
 
     override fun getWorkQueue(project: Project): List<WorkQueueItem> =
-        workQueueRepository.findByProject_IdOrderByOrderAsc(project.id)
+        getWorkQueueItemsSorted(project)
 
     override fun updateWork(
         project: Project,
@@ -164,39 +176,31 @@ class WorkServiceImpl(
 
     override fun reorderWorkOrder(project: Project, work: Work, newOrder: Int): WorkQueueItem =
         workQueueRepository
-            .findByWork__idAndProject_Id(work.id, project.id) // TODO: replace with existsByWork__idAndProject_Id
-            .orElseThrow()
-            .let { workQueueItem ->
+            .existsByWork__idAndProject_Id(work.id, project.id)
+            .let {
+                if (!it) {
+                    throw ResourceNotFoundException("WorkQueueItem with WorkId=${work.id} not found")
+                }
+            }
+            .let {
                 if (newOrder < 0) {
                     throw InvalidServiceArguments("Work's order cannot be lower then zero")
                 }
 
-                val queue = getWorkQueue(project)
+                val workItems = getWorkItemsSorted(project).filterNot {
+                    it.id == work.id
+                }.toMutableList()
 
-                val queueWithoutItem = queue.filterNot {
-                    it.id == workQueueItem.id
+                val actualOrder = getActualItemOrder(workItems, newOrder)
+
+                if (actualOrder > workItems.size) {
+                    workItems.add(work)
+                } else {
+                    workItems.add(actualOrder, work)
                 }
 
-                val actualOrder = getItemOrder(queueWithoutItem, newOrder)
-
-                queue.forEach {
-                    when {
-                        it.id == workQueueItem.id -> {
-                            it.order = actualOrder
-                        }
-
-                        it.order > actualOrder -> {
-                            it.order += 1
-                        }
-
-                        it.order == actualOrder -> {
-                            it.order -= 1
-                        }
-                    }
-                }
-
-                fixWorkItemQueueAndSave(queue).first {
-                    it.id == workQueueItem.id
+                saveWorkQueueItems(project, workItems).first {
+                    it.work.id == work.id
                 }
             }
 
@@ -205,7 +209,7 @@ class WorkServiceImpl(
             .let {
                 workRepository.delete(it)
             }.also {
-                fixWorkItemQueueAndSave(getWorkQueue(project))
+                saveWorkQueueItems(project)
             }
 
     private fun getWorkOrThrow(project: Project, id: Long): Work =
@@ -248,70 +252,49 @@ class WorkServiceImpl(
         }
     }
 
-    private fun saveWorkInQueue(project: Project, work: Work, expectedItemOrder: Int?): WorkQueueItem {
-        val queue = workQueueRepository.findByProject_IdOrderByOrderAsc(project.id)
-        val actualItemOrder = getItemOrder(queue, expectedItemOrder)
-
-        if (expectedItemOrder != null) {
-            queue.forEach {
-                if (it.order >= actualItemOrder) {
-                    it.order += 1
-                }
-            }
-
-            fixWorkItemQueueAndSave(queue)
-        }
-
-        return WorkQueueItem(
-            null,
-            work = work,
-            order = actualItemOrder,
-            project = project
-        ).let {
-            workQueueRepository.save(it)
-        }
-    }
-
-    private fun getItemOrder(queue: List<WorkQueueItem>, expectedItemOrder: Int?): Int {
-        val maxQueueOrder = queue.maxOfOrNull { it.order } ?: 0
-
+    private fun getActualItemOrder(items: List<Work>, expectedItemOrder: Int?): Int {
         return when {
-            (queue.isEmpty()) -> 0
-            (expectedItemOrder == null || maxQueueOrder <= expectedItemOrder) -> (maxQueueOrder + 1)
+            (items.isEmpty()) -> 0
+            (expectedItemOrder == null || items.size <= expectedItemOrder) -> (items.size + 1)
             else -> expectedItemOrder
         }
     }
 
-    private fun fixWorkItemQueueAndSave(queue: List<WorkQueueItem>): List<WorkQueueItem> {
-        val sortedQueue = queue.sortedBy {
-            it.order
+    private fun getWorkQueueItemsSorted(project: Project) =
+        workQueueRepository.findByProject_IdOrderByOrderAsc(project.id)
+
+    private fun getWorkItemsSorted(project: Project) =
+        getWorkQueueItemsSorted(project).map {
+            it.work
         }
 
-        return if (sortedQueue.isNotEmpty()) {
-            val diff = sortedQueue.first().order
+    private fun saveWorkQueueItems(project: Project): List<WorkQueueItem> =
+        saveWorkQueueItems(getWorkQueueItemsSorted(project))
 
-            if (diff > 0) {
-                sortedQueue.forEach {
-                    it.order -= diff
+    private fun saveWorkQueueItems(project: Project, workItems: List<Work>): List<WorkQueueItem> =
+        getWorkQueueItemsSorted(project).let { queue ->
+            val queueItems = workItems.map { work ->
+                queue.find {
+                    it.work.id == work.id
                 }
+                    ?: WorkQueueItem(
+                        id = null,
+                        project = project,
+                        work = work,
+                        order = -1
+                    )
             }
 
-            if (sortedQueue.size > 1) {
-                for (i in sortedQueue.indices) {
-                    if (i == 0) continue
-
-                    val item = sortedQueue[i]
-                    val prevItem = sortedQueue[i - 1]
-
-                    if (item.order - 1 != prevItem.order) {
-                        item.order = prevItem.order + 1
-                    }
-                }
-            }
-
-            workQueueRepository.saveAll(sortedQueue)
-        } else {
-            listOf()
+            saveWorkQueueItems(queueItems)
         }
-    }
+
+
+    private fun saveWorkQueueItems(queueItems: List<WorkQueueItem>): List<WorkQueueItem> =
+        queueItems.let {
+            it.forEachIndexed { i, item ->
+                item.order = i
+            }
+
+            workQueueRepository.saveAll(it)
+        }
 }

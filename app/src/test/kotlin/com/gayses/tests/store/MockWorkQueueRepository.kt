@@ -34,6 +34,16 @@ object MockWorkQueueRepository : MockStore<WorkQueueItem>() {
                     }
                 }
 
+            every { existsByWork__idAndProject_Id(any(), any()) }
+                .answers {
+                    val workId = firstArg<Long>()
+                    val projectId = secondArg<Long>()
+
+                    TestsDataStore.workQueueItems.any {
+                        it.work.id == workId && it.project.id == projectId
+                    }
+                }
+
             every { save(any()) }
                 .answers {
                     val item = firstArg<WorkQueueItem>()
@@ -50,9 +60,7 @@ object MockWorkQueueRepository : MockStore<WorkQueueItem>() {
                     val items = firstArg<Iterable<WorkQueueItem>>()
 
                     items.forEach {
-                        if (!it.hasId) {
-                            it.updateId(idGenerator.incrementAndGet())
-                        }
+                        save(it)
                     }
 
                     items.toList()

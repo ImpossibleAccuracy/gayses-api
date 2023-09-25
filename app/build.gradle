@@ -38,6 +38,7 @@ dependencies {
 
     // DATABASE DEPENDENCIES
     runtimeOnly libs.mysql.connector
+    runtimeOnly libs.h2.connector
 
     // JWT DEPENDENCIES
     implementation libs.jwt.api

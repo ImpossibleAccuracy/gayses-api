@@ -16,7 +16,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/project/{projectId}/work")
+@RequestMapping("/project/{projectId}/work/")
 @PreAuthorize("isAuthenticated()")
 @Validated
 @SecurityRequirement(name = "bearerAuth")
