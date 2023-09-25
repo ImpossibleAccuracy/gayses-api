@@ -1,20 +1,8 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 buildscript {
     repositories {
         google()
         mavenCentral()
     }
-}
-
-plugins {
-    alias libs.plugins.spring apply false
-    alias libs.plugins.dependency.management apply false
-
-    alias libs.plugins.kotlin.jvm apply false
-    alias libs.plugins.kotlin.allopen apply false
-    alias libs.plugins.kotlin.spring apply false
-    alias libs.plugins.kotlin.jpa apply false
 }
 
 subprojects {
@@ -25,13 +13,3 @@ subprojects {
     }
 }
 
-tasks.register('clean', Delete) {
-    delete rootProject.buildDir
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += '-Xjsr305=strict'
-        jvmTarget = '18'
-    }
-}

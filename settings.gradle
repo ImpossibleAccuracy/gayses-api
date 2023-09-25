@@ -13,7 +13,8 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = 'template'
+rootProject.name = 'WorkFlow'
 
-include ':app'
-include ':security-jwt'
+include ':web-api'
+include ':web-api:app'
+include ':web-api:security-jwt'
